@@ -18,8 +18,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.study.coolweather.gson.Forcast;
-import com.android.study.coolweather.gson.Weather;
+import com.android.study.coolweather.gson.bingImage.Images;
+import com.android.study.coolweather.gson.weather.Forcast;
+import com.android.study.coolweather.gson.weather.Weather;
 import com.android.study.coolweather.util.HttpUtil;
 import com.android.study.coolweather.util.Utility;
 import com.bumptech.glide.Glide;
@@ -203,24 +204,39 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void loadBingPic() {
-        String requestBingPic = "http://guolin.tech/api/bing_pic";
+        //String requestBingPic = "http://guolin.tech/api/bing_pic";
+        final String binUrlBase = "http://www.bing.com";
+        String requestBingPic = "http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN";
         HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(WeatherActivity.this, "获取背景图失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                final String bingPic = response.body().string();
-                SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this)
-                        .edit();
-                edit.putString("bing_pic", bingPic);
-                edit.apply();
+                String responseText = response.body().string();
+                final Images images = Utility.handleBingImageResponse(responseText);
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
+                        if (images != null && images.url != null) {
+                            String url = binUrlBase + images.url;
+                            SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this)
+                                    .edit();
+                            edit.putString("bing_pic", url);
+                            edit.apply();
+                            Glide.with(WeatherActivity.this).load(url).into(bingPicImg);
+                        } else {
+                            Toast.makeText(WeatherActivity.this, "获取背景图失败", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }

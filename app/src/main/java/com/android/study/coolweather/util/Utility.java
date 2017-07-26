@@ -6,7 +6,8 @@ import android.text.TextUtils;
 import com.android.study.coolweather.db.City;
 import com.android.study.coolweather.db.County;
 import com.android.study.coolweather.db.Province;
-import com.android.study.coolweather.gson.Weather;
+import com.android.study.coolweather.gson.bingImage.Images;
+import com.android.study.coolweather.gson.weather.Weather;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -111,6 +112,50 @@ public class Utility {
             JSONArray jsonArray = jsonObject.getJSONArray("HeWeather5");
             String weatherContent = jsonArray.getJSONObject(0).toString();
             return new Gson().fromJson(weatherContent, Weather.class);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Bing 图片 API
+     *
+     * @param reponse
+     * @return {
+     * "images": [
+     * {
+     * "startdate": "20170725",
+     * "fullstartdate": "201707251600",
+     * "enddate": "20170726",
+     * "url": "/az/hprichbg/rb/WilsonPeakWindow_ZH-CN10363033426_1920x1080.jpg",
+     * "urlbase": "/az/hprichbg/rb/WilsonPeakWindow_ZH-CN10363033426",
+     * "copyright": "从鬼城Alta看到的威尔逊峰，美国科罗拉多州 (© Grant Ordelheide/Tandem Stills + Motion)",
+     * "copyrightlink": "http://www.bing.com/search?q=Wilson+Peak&form=hpcapt&mkt=zh-cn",
+     * "quiz": "/search?q=Bing+homepage+quiz&filters=WQOskey:%22HPQuiz_20170725_WilsonPeakWindow%22&FORM=HPQUIZ",
+     * "wp": false,
+     * "hsh": "5287e909cbbb7cf8b7b71318c8f47ab6",
+     * "drk": 1,
+     * "top": 1,
+     * "bot": 1,
+     * "hs": []
+     * }
+     * ],
+     * "tooltips": {
+     * "loading": "正在加载...",
+     * "previous": "上一个图像",
+     * "next": "下一个图像",
+     * "walle": "此图片不能下载用作壁纸。",
+     * "walls": "下载今日美图。仅限用作桌面壁纸。"
+     * }
+     * }
+     */
+    public static Images handleBingImageResponse(String reponse) {
+        try {
+            JSONObject jsonObject = new JSONObject(reponse);
+            JSONArray jsonArray = jsonObject.getJSONArray("images");
+            String imageContents = jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(imageContents, Images.class);
         } catch (JSONException e) {
             e.printStackTrace();
         }

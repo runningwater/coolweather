@@ -1,4 +1,4 @@
-package com.android.study.coolweather.gson;
+package com.android.study.coolweather.gson.weather;
 
 /**
  * Created by runningwater on 2017/7/24.
